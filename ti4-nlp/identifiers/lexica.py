@@ -4,8 +4,6 @@ class WordIndex:
         for key_term, aliases in words_and_aliases:
             self._register(key_term, aliases)
 
-    pass
-
     def _register(self, term, aliases):
         lowered_term = term.lower()
         if lowered_term in self.alias_index:

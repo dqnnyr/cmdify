@@ -1,7 +1,7 @@
 class WordIndex:
     def __init__(self, **words_and_aliases):
         self.alias_index = {}
-        for key_term, aliases in words_and_aliases:
+        for key_term, aliases in words_and_aliases.items():
             self._register(key_term, aliases)
 
     def _register(self, term, aliases):
@@ -30,10 +30,10 @@ class WordClassifier:
 
 def generate_index_and_classifier(**class_words_and_aliases):
     classifications = {k: list(v.keys()) for k, v in class_words_and_aliases.items()}
-    aliases = {}
+    term_aliases = {}
     for alias_dict in class_words_and_aliases.values():
         for term, aliases in alias_dict.items():
-            aliases[term] = aliases
-    index = WordIndex(**aliases)
+            term_aliases[term] = aliases
+    index = WordIndex(**term_aliases)
     classifier = WordClassifier(**classifications)
     return index, classifier

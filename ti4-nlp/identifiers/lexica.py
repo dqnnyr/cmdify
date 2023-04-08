@@ -32,7 +32,10 @@ class WordClassifier:
 
 def generate_index_and_classifier(**class_words_and_aliases):
     classifications = {k: list(v.keys()) for k, v in class_words_and_aliases.items()}
-    aliases = {k: v for k, v in [subdict.items() for subdict in class_words_and_aliases.values()]}
+    aliases = {}
+    for alias_dict in class_words_and_aliases.values():
+        for term, aliases in alias_dict.items():
+            aliases[term] = aliases
     index = WordIndex(**aliases)
     classifier = WordClassifier(**classifications)
     return index, classifier

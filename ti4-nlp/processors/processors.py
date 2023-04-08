@@ -9,6 +9,11 @@ class QueryProcessor:
         self.word_classifier = word_classifier
         self.identifier = identifier
 
+    @staticmethod
+    def preprocess(query):
+        and_ified = re.sub(r'[,;/]+', ' and ', query)
+        return [token for token in and_ified.split(' ') if len(token)]
+
     @abc.abstractmethod
     def process(self, query):
         return
@@ -27,11 +32,6 @@ class SimpleQueryProcessor(QueryProcessor):
         self.preposition_class = preposition_class
         self.conjunction_class = conjunction_class
         super().__init__(word_classifier, identifier)
-
-    @staticmethod
-    def preprocess(query):
-        and_ified = re.sub(r'[,;/!?]+', ' and ', query)
-        return [token for token in and_ified.split(' ') if len(token)]
 
     def process(self, query):
         tokens = self.preprocess(query)

@@ -30,7 +30,8 @@ index, classifier = generate_index_and_classifier(**data)
 identifier = GraphPruningIdentifier(index, threshold=6)
 processor = SimpleQueryProcessor(classifier, identifier)
 
-output = processor.process('play Fireball on the blue player')
+# The SimpleQueryProcessor utilizes fuzzy detection.
+output = processor.process('play fireblal on the blue player')
 
 if isinstance(output, Success):
     for action in output.result:

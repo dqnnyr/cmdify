@@ -47,7 +47,15 @@ class Identifier:
         return all_results
 
 
-class SimpleIdentifier(Identifier):
+class LiteralIdentifier(Identifier):
+    def find_best(self, token):
+        if token in self.word_index.alias_index:
+            return [self.word_index.alias_index[token]], 0
+        return [], 0
+
+
+class FuzzyIdentifier(Identifier):
+
     def find_best(self, token):
         best = ([], self.threshold)
         for word, keyword in self.word_index.alias_index.items():

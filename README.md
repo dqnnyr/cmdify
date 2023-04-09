@@ -46,6 +46,6 @@ elif isinstance(output, Failure):
 
 Expected output:
 ```
-{'verb': 'play', 'components': 'Fireball', 'on': 'blue player'}
-{'verb': 'discard', 'components': 'Lightning'}
+{'verb': 'play', 'components': ['Fireball'], 'on': ['blue player']}
+{'verb': 'discard', 'components': ['Lightning']}
 ```

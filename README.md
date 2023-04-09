@@ -30,7 +30,7 @@ index, classifier = generate_index_and_classifier(**data)
 identifier = GraphPruningIdentifier(index, threshold=6)
 processor = SimpleQueryProcessor(classifier, identifier)
 
-# The SimpleQueryProcessor utilizes fuzzy detection.
+# The GraphPruningIdentifier utilizes fuzzy detection.
 output = processor.process('play fireblal on the blue player and discard Lightning')
 
 if isinstance(output, Success):

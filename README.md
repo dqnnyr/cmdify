@@ -31,7 +31,7 @@ identifier = GraphPruningIdentifier(index, threshold=6)
 processor = SimpleQueryProcessor(classifier, identifier)
 
 # The SimpleQueryProcessor utilizes fuzzy detection.
-output = processor.process('play fireblal on the blue player')
+output = processor.process('play fireblal on the blue player and discard Lightning')
 
 if isinstance(output, Success):
     for action in output.result:
@@ -42,4 +42,10 @@ elif isinstance(output, Failure):
             print(f'Ambiguous word "{error.word}" (could be: {", ".join(error.options)})')
         elif isinstance(error, UnrecognizedWordError):
             print(f'Unrecognized word "{error.word}"')
+```
+
+Expected output:
+```
+{'verb': 'play', 'components': 'Fireball', 'on': 'blue player'}
+{'verb': 'discard', 'components': 'Lightning'}
 ```

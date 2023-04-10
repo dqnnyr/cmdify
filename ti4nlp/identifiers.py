@@ -105,7 +105,7 @@ class GraphPruningIdentifier(Identifier):
             else:
                 # Prune all words that definitely cannot beat the best, according to the graph
                 for i in range(1, self.threshold):
-                    if distance - i > best[i]:
+                    if distance - i > best[1]:
                         for irrelevant_word in self.graph[word][i]:
                             eligible_words.discard(irrelevant_word)
                     else:

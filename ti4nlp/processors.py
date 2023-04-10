@@ -1,5 +1,7 @@
-import abc, re
-from result import Success, Failure, UnrecognizedWordError, AmbiguousWordError
+import abc
+import re
+
+from ti4nlp.result import Success, Failure, UnrecognizedWordError, AmbiguousWordError
 
 
 class QueryProcessor:

@@ -1,19 +1,20 @@
 import abc
 from textdistance import damerau_levenshtein
+from ti4nlp.lexica import WordIndex
 
 
 class Identifier:
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self, word_index, threshold):
+    def __init__(self, word_index: WordIndex, threshold: int):
         self.word_index = word_index
         self.threshold = threshold
 
     @abc.abstractmethod
-    def find_best(self, token):
-        return
+    def find_best(self, token: str) -> tuple[list[str], int]:
+        return [], self.threshold
 
-    def find_best_from_all(self, tokens):
+    def find_best_from_all(self, tokens: list[str]) -> list[tuple[str, list[str]]]:
         tokens = [token.lower() for token in tokens]
         all_results = []
         debt = 0
@@ -48,17 +49,19 @@ class Identifier:
 
 
 class LiteralIdentifier(Identifier):
-    def find_best(self, token):
-        if token in self.word_index.alias_index:
-            return [self.word_index.alias_index[token]], 0
+    def find_best(self, token: str) -> tuple[list[str], int]:
+        if token in self.word_index:
+            return [self.word_index[token]], 0
         return [], 0
 
 
 class FuzzyIdentifier(Identifier):
 
-    def find_best(self, token):
+    def find_best(self, token: str) -> tuple[list[str], int]:
+        if token in self.word_index:
+            return [self.word_index[token]], 0
         best = ([], self.threshold)
-        for word, keyword in self.word_index.alias_index.items():
+        for word, keyword in self.word_index.items():
             if abs(len(word) - len(token)) > best[1] + 1:
                 continue
             distance = damerau_levenshtein(token, word)
@@ -72,13 +75,13 @@ class FuzzyIdentifier(Identifier):
 
 
 class GraphPruningIdentifier(Identifier):
-    def __init__(self, word_index, threshold):
+    def __init__(self, word_index: WordIndex, threshold: int):
         super().__init__(word_index, threshold)
         self.graph = {}
         self._populate_graph()
 
     def _populate_graph(self):
-        words = list(self.word_index.alias_index.keys())
+        words = list(self.word_index.keys())
         for word in words:
             self.graph[word] = {x: set() for x in range(1, self.threshold)}
         for i, a in enumerate(words):
@@ -88,10 +91,10 @@ class GraphPruningIdentifier(Identifier):
                     self.graph[a][distance].add(b)
                     self.graph[b][distance].add(a)
 
-    def find_best(self, token):
-        eligible_words = set(self.word_index.alias_index.keys())
+    def find_best(self, token: str) -> tuple[list[str], int]:
+        eligible_words = set(self.word_index.keys())
         best = ([], self.threshold)
-        for word, keyword in self.word_index.alias_index.items():
+        for word, keyword in self.word_index.items():
             if abs(len(word) - len(token)) > best[1] + 1 \
                     or word not in eligible_words:
                 continue

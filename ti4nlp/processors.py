@@ -1,41 +1,43 @@
 import abc
 import re
 
+from ti4nlp.lexica import WordClassifier
 from ti4nlp.result import Success, Failure, UnrecognizedWordError, AmbiguousWordError
+from ti4nlp.identifiers import Identifier
 
 
 class QueryProcessor:
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self, word_classifier, identifier):
+    def __init__(self, word_classifier: WordClassifier, identifier: Identifier):
         self.word_classifier = word_classifier
         self.identifier = identifier
 
     @staticmethod
-    def preprocess(query):
+    def preprocess(query: str) -> list[str]:
         and_ified = re.sub(r'[,;/]+', ' and ', query)
         return [token for token in and_ified.split(' ') if len(token)]
 
     @abc.abstractmethod
-    def process(self, query):
+    def process(self, query: str):
         return
 
 
 class SimpleQueryProcessor(QueryProcessor):
-    def __init__(self, word_classifier, identifier, *,
-                 noun_class='noun',
-                 verb_class='verb',
-                 qualifier_class='qualifier',
-                 conjunction_class='conjunction',
-                 preposition_class='preposition'):
+    def __init__(self, word_classifier: WordClassifier, identifier: Identifier, *,
+                 noun_class: str = 'noun',
+                 verb_class: str = 'verb',
+                 qualifier_class: str = 'qualifier',
+                 conjunction_class: str = 'conjunction',
+                 preposition_class: str = 'preposition'):
+        super().__init__(word_classifier, identifier)
         self.noun_class = noun_class
         self.verb_class = verb_class
         self.qualifier_class = qualifier_class
         self.preposition_class = preposition_class
         self.conjunction_class = conjunction_class
-        super().__init__(word_classifier, identifier)
 
-    def process(self, query):
+    def process(self, query: str):
         tokens = self.preprocess(query)
         meanings_queue = self.identifier.find_best_from_all(tokens)
 

@@ -77,21 +77,23 @@ class FuzzyIdentifier(Identifier):
 class GraphPruningIdentifier(Identifier):
     def __init__(self, word_index: WordIndex, threshold: int):
         super().__init__(word_index, threshold)
-        self.graph = {}
+        self._graph = {}
         self._populate_graph()
 
     def _populate_graph(self):
         words = list(self.word_index.keys())
         for word in words:
-            self.graph[word] = {x: set() for x in range(1, self.threshold)}
+            self._graph[word] = {x: set() for x in range(1, self.threshold)}
         for i, a in enumerate(words):
             for b in words[i+1:]:
                 distance = damerau_levenshtein(a, b)
                 if distance < self.threshold:
-                    self.graph[a][distance].add(b)
-                    self.graph[b][distance].add(a)
+                    self._graph[a][distance].add(b)
+                    self._graph[b][distance].add(a)
 
     def find_best(self, token: str) -> tuple[list[str], int]:
+        if token in self.word_index:
+            return [self.word_index[token]], 0
         eligible_words = set(self.word_index.keys())
         best = ([], self.threshold)
         for word, keyword in self.word_index.items():
@@ -109,7 +111,7 @@ class GraphPruningIdentifier(Identifier):
                 # Prune all words that definitely cannot beat the best, according to the graph
                 for i in range(1, self.threshold):
                     if distance - i > best[1]:
-                        for irrelevant_word in self.graph[word][i]:
+                        for irrelevant_word in self._graph[word][i]:
                             eligible_words.discard(irrelevant_word)
                     else:
                         break

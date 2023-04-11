@@ -1,23 +1,24 @@
 import abc
 import re
 
+from ti4nlp.lexica import WordClassifier
 from ti4nlp.result import Success, Failure, UnrecognizedWordError, AmbiguousWordError
 
 
 class QueryProcessor:
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self, word_classifier, identifier):
+    def __init__(self, word_classifier: WordClassifier, identifier):
         self.word_classifier = word_classifier
         self.identifier = identifier
 
     @staticmethod
-    def preprocess(query):
+    def preprocess(query: str) -> list[str]:
         and_ified = re.sub(r'[,;/]+', ' and ', query)
         return [token for token in and_ified.split(' ') if len(token)]
 
     @abc.abstractmethod
-    def process(self, query):
+    def process(self, query: str):
         return
 
 

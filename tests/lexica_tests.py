@@ -37,7 +37,8 @@ def get_test_data():
             **{k: [] for k in [
                 'Nestphar', 'Arc Prime', 'Wren Terra', 'Lisis II', 'Ragh', 'Muaat', 'Hercant', 'Arretze', 'Kamdorn',
                 'Jord', 'Creuss', '[0.0.0]', 'Moll Primus', 'Druaa', 'Maaluuk', "Tren'Lak", 'Quinarra', 'Jol', 'Nar',
-                'Winnu', 'Archon Ren', 'Archon Tau', 'Darien', 'Retillion', 'Shalloq',
+                'Winnu', 'Archon Ren', 'Archon Tau', 'Darien', 'Retillion', 'Shalloq', 'Valk', 'Avar', 'Ylir',
+                'The Dark', 'Ixth', 'Naazir', 'Rokha', 'Arcturus', 'Elysium', 'Acheron',
                 'Abyz', 'Fria', 'Arinam', 'Meer', 'Arnor', 'Lor', 'Bereg', 'Centauri', 'Gral', 'Coorneeq',
                 'Resculon', 'Dal Bootha', 'Xxehan', 'Lazar', 'Sakulag', 'Lodor', 'Mehar Xull', 'Mellon', 'Zohbat',
                 'New Albion', 'Starpoint', 'Quann', "Qucen'n", 'Rarron', 'Saudor', "Tar'mann", "Tequ'ran", 'Torkan',
@@ -81,9 +82,8 @@ def get_test_data():
             'then': [],
         },
         'preposition': {
-            'to': [],
-            'from': ['in'],
-            'on': [],
+            'to': ['onto'],
+            'from': ['in', 'on'],
             'with': ['for', 'as'],
         },
         'skip_word': {

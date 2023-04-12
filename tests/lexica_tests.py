@@ -16,7 +16,7 @@ def get_test_data():
                      "moyin's ashes", 'blackshade infiltrator'],
             'Fighter': ['ff', 'hybrid crystal fighter', 'crystal fighter', 'hcf', 'cf'],
             'Dreadnought': ['dread', 'super dreadnought', 'sdread', 'super dread', 'exotrireme'],
-            'Destroyer': ['dd', 'strike wing alpha', 'swa', 'swing alpha', 'swing'],
+            'Destroyer': ['dest', 'dd', 'strike wing alpha', 'swa', 'swing alpha', 'swing'],
             'Cruiser': ['saturn engine', 'saturn'],
             'Carrier': ['advanced carrier', 'adv carrier'],
             'Flagship': ['duha menaimon', 'quetzecoatl', 'arc secundus', 'son of ragh', 'artemiris', 'the inferno',

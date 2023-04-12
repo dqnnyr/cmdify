@@ -9,7 +9,7 @@ from ti4nlp.identifiers import Identifier
 class NounPhrase:
     def __init__(self, noun: str, qualifiers=None):
         self._noun = noun
-        self._data = {}
+        self._prepositions = {}
         if qualifiers is None:
             self._qualifiers = []
         else:
@@ -20,16 +20,16 @@ class NounPhrase:
         return self._noun
 
     def __contains__(self, item):
-        return item in self._data
+        return item in self._prepositions
 
     def add_qualifier(self, qualifier: str):
         self._qualifiers.append(qualifier)
 
     def add_preposition(self, preposition: str, dependents):
-        self._data[preposition] = dependents
+        self._prepositions[preposition] = dependents
 
     def get_prepositions(self):
-        return self._data.items()
+        return self._prepositions.items()
 
 
 class PrepositionalPhrase:
@@ -115,17 +115,14 @@ class SimpleQueryProcessor(QueryProcessor):
         for original, candidates in canonical_words:
             if len(candidates) > 1:
                 errors.append(AmbiguousWordError(original, candidates))
-                print(errors[-1], original)
             elif len(candidates) == 0:
                 errors.append(UnrecognizedWordError(original))
-                print(errors[-1], original)
             elif candidates[0] not in self.word_classifier:
                 errors.append(UnclassifiedWordError(candidates[0]))
-                print(errors[-1], candidates[0])
         if len(errors):
             return Failure(errors)
 
-        return Success(self.interpret([item[0] for item in canonical_words]))
+        return Success(self.interpret([item[1][0] for item in canonical_words]))
 
     def interpret(self, tokens: list[str]):
         actions = []

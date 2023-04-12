@@ -2,8 +2,72 @@ import abc
 import re
 
 from ti4nlp.lexica import WordClassifier
-from ti4nlp.result import Success, Failure, UnrecognizedWordError, AmbiguousWordError
+from ti4nlp.result import Result, Success, Failure, UnrecognizedWordError, AmbiguousWordError, UnclassifiedWordError
 from ti4nlp.identifiers import Identifier
+
+
+class NounPhrase:
+    def __init__(self, noun: str, qualifiers=None):
+        self._noun = noun
+        self._data = {}
+        if qualifiers is None:
+            self._qualifiers = []
+        else:
+            self._qualifiers = qualifiers
+
+    @property
+    def noun(self):
+        return self._noun
+
+    def __contains__(self, item):
+        return item in self._data
+
+    def add_qualifier(self, qualifier: str):
+        self._qualifiers.append(qualifier)
+
+    def add_preposition(self, preposition: str, dependents):
+        self._data[preposition] = dependents
+
+    def get_prepositions(self):
+        return self._data.items()
+
+
+class PrepositionalPhrase:
+    def __init__(self, preposition: str, dependents: list[NounPhrase]):
+        self.preposition = preposition
+        self.dependents = dependents
+
+
+class Action:
+    def __init__(self):
+        self.verb = None
+        self.direct_objects = []
+        self.prepositional_phrases = []
+        self._last_modified = []
+
+    def has_verb(self) -> bool:
+        return self.verb is not None
+
+    def set_verb(self, verb: str):
+        self.verb = verb
+
+    def add_direct_object(self, direct_object: NounPhrase):
+        self.direct_objects.append(direct_object)
+
+    def add_prepositional_phrase(self, prepositional_phrase: PrepositionalPhrase):
+        cached = self._last_modified
+        self._last_modified = []
+        for noun in self.direct_objects:
+            if prepositional_phrase.preposition not in noun:
+                self._last_modified.append(noun)
+                noun.add_preposition(prepositional_phrase.preposition, prepositional_phrase.dependents)
+        if len(self._last_modified) == 0:
+            for noun in cached:
+                x = noun.copy()
+                self.add_direct_object(x)
+                x.add_preposition(prepositional_phrase.preposition, prepositional_phrase.dependents)
+                self._last_modified.append(noun)
+            self._last_modified = cached
 
 
 class QueryProcessor:
@@ -19,7 +83,11 @@ class QueryProcessor:
         return [token for token in and_ified.split(' ') if len(token)]
 
     @abc.abstractmethod
-    def process(self, query: str):
+    def process(self, query: str) -> Result:
+        return Result()
+
+    @abc.abstractmethod
+    def interpret(self, tokens: list[str]):
         return
 
 
@@ -29,89 +97,61 @@ class SimpleQueryProcessor(QueryProcessor):
                  verb_class: str = 'verb',
                  qualifier_class: str = 'qualifier',
                  conjunction_class: str = 'conjunction',
-                 preposition_class: str = 'preposition'):
+                 preposition_class: str = 'preposition',
+                 particle_class: str = 'particle'):
         super().__init__(word_classifier, identifier)
         self.noun_class = noun_class
         self.verb_class = verb_class
         self.qualifier_class = qualifier_class
         self.preposition_class = preposition_class
         self.conjunction_class = conjunction_class
+        self.particle_class = particle_class
 
     def process(self, query: str):
         tokens = self.preprocess(query)
-        meanings_queue = self.identifier.find_best_from_all(tokens)
+        canonical_words = self.identifier.find_best_from_all(tokens)
 
-        # Potential return types
-        actions = []
         errors = []
+        for original, candidates in canonical_words:
+            if len(candidates) > 1:
+                errors.append(AmbiguousWordError(original, candidates))
+                print(errors[-1], original)
+            elif len(candidates) == 0:
+                errors.append(UnrecognizedWordError(original))
+                print(errors[-1], original)
+            elif candidates[0] not in self.word_classifier:
+                errors.append(UnclassifiedWordError(candidates[0]))
+                print(errors[-1], candidates[0])
+        if len(errors):
+            return Failure(errors)
 
-        # The action object to be built
-        action = {'verb': None, 'objects': []}
+        return Success(self.interpret([item[0] for item in canonical_words]))
 
-        # Parameters for helping process groups of words.
-        target = None
-        more = False
-        quality_prefix = ''
+    def interpret(self, tokens: list[str]):
+        actions = []
 
-        for token, meanings in meanings_queue:
-            # Once an error is encountered, we give up on actually processing,
-            # since the actions will probably end up nonsense if we do.
-            if len(meanings) != 1 or len(errors):
-                if len(meanings) == 0:
-                    errors.append(UnrecognizedWordError(token))
-                elif len(meanings) > 1:
-                    errors.append(AmbiguousWordError(token, meanings))
-                continue
-            true_meaning = meanings[0]
-
-            if true_meaning in self.word_classifier[self.noun_class]:
-                if more and target:
-                    action[target].append(quality_prefix + true_meaning)
-                else:
-                    action['objects'].append(quality_prefix + true_meaning)
-                more = False
-                quality_prefix = ''
-
-            elif true_meaning in self.word_classifier[self.verb_class]:
-                # If there's an outstanding adjective, just treat it as a noun.
-                if len(quality_prefix):
-                    if target:
-                        action[target].append(quality_prefix[:-1])
-                    else:
-                        action['objects'].append(quality_prefix[:-1])
-                    quality_prefix = ''
-
-                # Reset for the next action.
-                target = None
-                more = False
-                if action['verb']:
+        action = Action()
+        preposition = None
+        qualifiers = []
+        for token in tokens:
+            if token in self.word_classifier[self.verb_class]:
+                if action.has_verb():
                     actions.append(action)
-                    action = {'verb': None, 'objects': []}
-                action['verb'] = true_meaning
-
-            elif true_meaning in self.word_classifier[self.preposition_class]:
-                # With prepositions, we expect the next noun(s) to be
-                # applying to the preposition, i.e., in "move to Paris",
-                # "to Paris" indicates more than "move Paris"
-
-                # If there's an outstanding adjective, just treat it as a noun.
-                if len(quality_prefix):
-                    if target:
-                        action[target].append(quality_prefix[:-1])
-                    else:
-                        action['objects'].append(quality_prefix[:-1])
-                    quality_prefix = ''
-                # Setting up the preposition for assignment
-                action[true_meaning] = []
-                target = true_meaning
-                more = True
-
-            elif true_meaning in self.word_classifier[self.qualifier_class]:
-                # Adjectives are appended before the next noun,
-                # or in desperate times just treated as nouns.
-                quality_prefix = quality_prefix + true_meaning + ' '
-            elif true_meaning in self.word_classifier[self.conjunction_class]:
-                more = True
-
+                    action = Action()
+                action.set_verb(token)
+            elif token in self.word_classifier[self.preposition_class]:
+                preposition = token
+            elif token in self.word_classifier[self.noun_class]:
+                np = NounPhrase(token, qualifiers)
+                qualifiers = []
+                if preposition is not None:
+                    pp = PrepositionalPhrase(preposition, [np])
+                    action.add_prepositional_phrase(pp)
+                    preposition = None
+                else:
+                    action.add_direct_object(np)
+            elif token in self.word_classifier[self.qualifier_class]:
+                qualifiers.append(token)
         actions.append(action)
-        return Failure(errors) if len(errors) else Success(actions)
+
+        return actions

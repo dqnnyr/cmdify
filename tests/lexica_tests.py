@@ -204,8 +204,8 @@ class LexicaTests(unittest.TestCase):
         index2 = WordIndex(**get_test_aliases())
         classifier2 = WordClassifier(**get_test_classifications())
 
-        self.assertEqual(index1.alias_index, index2.alias_index,
-                         f"Indexes didn't match: \n{index1.alias_index}\n{index2.alias_index}")
+        self.assertEqual(index1._alias_index, index2._alias_index,
+                         f"Indexes didn't match: \n{index1._alias_index}\n{index2._alias_index}")
         self.assertEqual(classifier1.data, classifier2.data,
                          f"Classifiers didn't match: \n{classifier1.data}\n{classifier2.data}")
 

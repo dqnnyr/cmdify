@@ -43,7 +43,10 @@ class WordClassifier:
         return self._data[item]
 
     def __contains__(self, item: str) -> bool:
-        return item in self._data
+        for key in self._data.keys():
+            if item in self._data[key]:
+                return True
+        return False
 
     def items(self):
         return self._data.items()

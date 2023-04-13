@@ -19,11 +19,12 @@ def test():
         if isinstance(output, Success):
             for action in output.result:
                 print(f'Action: {action.verb}')
-                print(f'{action.direct_objects}')
                 for noun in action.direct_objects:
-                    print(f'    {noun.noun} ({noun._qualifiers})')
+                    qualifiers = f' ({", ".join(noun._qualifiers)})' if len(noun._qualifiers) else ''
+                    print(f'    {noun.noun}{qualifiers}')
                     for prep, deps in noun._prepositions.items():
-                        print(f'        {prep}: {[f"{n.noun} ({n._qualifiers})" for n in deps]}')
+                        deps_list = [f'{n.noun} ({n._qualifiers})' if len(n._qualifiers) else f'{n.noun}' for n in deps]
+                        print(f'        {prep}: {", ".join(deps_list)}')
         elif isinstance(output, Failure):
             for error in output.errors:
                 if isinstance(error, AmbiguousWordError):

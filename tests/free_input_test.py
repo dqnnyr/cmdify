@@ -1,5 +1,5 @@
 from ti4nlp.lexica import generate_index_and_classifier
-from ti4nlp.identifiers import GraphPruningIdentifier
+from ti4nlp.identifiers import GraphPruningIdentifier, CachedIdentifier
 from ti4nlp.processors import SimpleQueryProcessor
 from ti4nlp.result import Success, Failure, AmbiguousWordError, UnrecognizedWordError
 from lexica_tests import get_test_data
@@ -9,7 +9,7 @@ def test():
     data = get_test_data()
     index, classifier = generate_index_and_classifier(**data)
 
-    identifier = GraphPruningIdentifier(index, threshold=6)
+    identifier = CachedIdentifier(GraphPruningIdentifier(index, threshold=6), buffer_size=50)
     processor = SimpleQueryProcessor(classifier, identifier)
     # The SimpleQueryProcessor utilizes fuzzy detection.
     query = input('Query: ')

@@ -1,4 +1,5 @@
 import abc
+from bidict import bidict
 from textdistance import damerau_levenshtein
 from ti4nlp.lexica import SynonymReverseIndex
 
@@ -75,7 +76,7 @@ class FuzzyIdentifier(Identifier):
 
 
 class GraphPruningIdentifier(Identifier):
-    def __init__(self, word_index: WordIndex, threshold: int):
+    def __init__(self, word_index: SynonymReverseIndex, threshold: int):
         super().__init__(word_index, threshold)
         self._graph = {}
         self._populate_graph()
@@ -116,3 +117,37 @@ class GraphPruningIdentifier(Identifier):
                     else:
                         break
         return best
+
+
+class CachedIdentifier(Identifier):
+    def __init__(self, identifier: Identifier, buffer_size: int):
+        super().__init__(identifier.word_index, identifier.threshold)
+        assert buffer_size >= 0
+
+        self._identifier = identifier
+        self._buffer_size = buffer_size
+        self._current_age = 0
+        self._prune_age = 0
+        self._cache = {}
+        self._ages = bidict({})
+
+    def find_best(self, token: str) -> tuple[list[str], int]:
+        if token in self._cache:
+            self._ages.inverse[token] = self._current_age
+            self._current_age = self._current_age + 1
+            return self._cache[token]
+        result = self._identifier.find_best(token)
+
+        self._cache[token] = result
+        self._ages[self._current_age] = token
+        self._current_age = self._current_age + 1
+
+        while len(self._cache) > self._buffer_size:
+            if self._prune_age in self._ages:
+                aged_token = self._ages[self._prune_age]
+                del self._cache[aged_token]
+                del self._ages[self._prune_age]
+            self._prune_age = self._prune_age + 1
+
+        return result
+

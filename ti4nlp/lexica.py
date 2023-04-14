@@ -4,7 +4,7 @@ class SynonymReverseIndex:
 
     .. highlight:: python
     .. code-block:: python
-        sri = SynonymReverseIndex({'term1': ['synonym1', 'synonym2'], 'term2': ['synonym3'], 'term3': []})
+        sri = SynonymReverseIndex(**{'term1': ['synonym1', 'synonym2'], 'term2': ['synonym3'], 'term3': []})
         assert sri['synonym2'] == 'term1'
         assert sri['term2'] == 'term2'
     """
@@ -65,7 +65,6 @@ class WordClassifier:
         for classification, words in classifications_and_words.items():
             self.data[classification] = set(words)
 
-    # get 
     def __getattr__(self, attr):
         return self.data[attr]
 

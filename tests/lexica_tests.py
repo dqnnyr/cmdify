@@ -28,6 +28,7 @@ def get_test_data():
             'PDS': ['Planetary Defense System', 'hel titan'],
             'Space Dock': ['sd', 'dock', 'floating factory', 'dimensional tear'],
             'Mecatol Rex': ['mr', 'mecrex'],
+            'planet': [],
             'Lirta IV': ['lirta4'],
             'Vefut II': ['vefut2'],
             'Rigel I': ['rigel1'],
@@ -83,7 +84,8 @@ def get_test_data():
         },
         'preposition': {
             'to': ['onto'],
-            'from': ['in', 'on'],
+            'in': ['on'],
+            'from': [],
             'with': ['for', 'as'],
         },
         'skip_word': {

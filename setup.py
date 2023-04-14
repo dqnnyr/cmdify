@@ -7,6 +7,7 @@ setup(
     license='MIT License',
     long_description=open('README.md').read(),
     install_requires=[
-        "textdistance >= 4.5.0"
+        'bidict~=0.22.1',
+        'textdistance~=4.5.0'
     ]
 )

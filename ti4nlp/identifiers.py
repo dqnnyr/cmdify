@@ -1,12 +1,12 @@
 import abc
 from textdistance import damerau_levenshtein
-from ti4nlp.lexica import WordIndex
+from ti4nlp.lexica import SynonymReverseIndex
 
 
 class Identifier:
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self, word_index: WordIndex, threshold: int):
+    def __init__(self, word_index: SynonymReverseIndex, threshold: int):
         self.word_index = word_index
         self.threshold = threshold
 

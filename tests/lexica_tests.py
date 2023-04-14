@@ -1,7 +1,7 @@
 import unittest
 import itertools
 
-from ti4nlp.lexica import generate_index_and_classifier, WordIndex, WordClassifier
+from ti4nlp.lexica import generate_index_and_classifier, SynonymReverseIndex, WordClassifier
 
 
 def get_test_data():

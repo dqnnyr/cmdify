@@ -54,7 +54,7 @@ index, classifier = generate_index_and_classifier(**data)
 # identifier might also be too vague
 identifier = GraphPruningIdentifier(index, threshold=6)
 
-# See processors.pu (processes the query)
+# See processors.py (processes the query)
 # takes in the classifier and identifier in order to actually process the query
 processor = SimpleQueryProcessor(classifier, identifier)
 

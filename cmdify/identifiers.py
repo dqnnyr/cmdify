@@ -1,7 +1,7 @@
 import abc
 from bidict import bidict
 from textdistance import damerau_levenshtein
-from ti4nlp.lexica import SynonymReverseIndex
+from cmdify.lexica import SynonymReverseIndex
 
 
 class Identifier:

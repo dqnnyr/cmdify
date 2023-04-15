@@ -1,7 +1,7 @@
-from ti4nlp.lexica import generate_index_and_classifier
-from ti4nlp.identifiers import GraphPruningIdentifier, CachedIdentifier
-from ti4nlp.processors import SimpleQueryProcessor
-from ti4nlp.result import Success, Failure, AmbiguousWordError, UnrecognizedWordError
+from cmdify.lexica import generate_index_and_classifier
+from cmdify.identifiers import GraphPruningIdentifier, CachedIdentifier
+from cmdify.processors import SimpleQueryProcessor
+from cmdify.result import Success, Failure, AmbiguousWordError, UnrecognizedWordError
 import itertools
 
 

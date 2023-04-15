@@ -1,9 +1,9 @@
 import abc
 import re
 
-from ti4nlp.identifiers import Identifier
-from ti4nlp.lexica import WordClassifier
-from ti4nlp.result import *
+from cmdify.identifiers import Identifier
+from cmdify.lexica import WordClassifier
+from cmdify.result import *
 
 
 class QueryProcessor:

@@ -15,8 +15,8 @@ class QueryProcessor:
 
     @staticmethod
     def preprocess(query: str) -> list[str]:
-        and_ified = re.sub(r'[,;/]+', ' and ', query)
-        return [token for token in and_ified.split(' ') if len(token)]
+        tokens: list[str] = re.findall(r'[^"\s]\S*|".+?"', re.sub(r'[,;/]+', ' and ', query))
+        return [token[1:-1].strip() if token[0] == '"' and token[0] == token[-1] else token for token in tokens]
 
     @abc.abstractmethod
     def process(self, query: str) -> Result:

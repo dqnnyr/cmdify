@@ -2,6 +2,7 @@ from ti4nlp.lexica import generate_index_and_classifier
 from ti4nlp.identifiers import GraphPruningIdentifier, CachedIdentifier
 from ti4nlp.processors import SimpleQueryProcessor
 from ti4nlp.result import Success, Failure, AmbiguousWordError, UnrecognizedWordError
+import itertools
 
 
 def get_test_data():
@@ -121,7 +122,7 @@ def test():
                     print(f'Ambiguous word "{error.word}" (could be: {", ".join(error.options)})')
                 elif isinstance(error, UnrecognizedWordError):
                     print(f'Unrecognized word "{error.word}"')
-        query = input('Query: ')
+        query = input('\nQuery: ')
 
 
 if __name__ == '__main__':

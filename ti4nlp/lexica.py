@@ -61,12 +61,12 @@ class WordClassifier:
         assert 'eat' in wc['verb']
     """
     def __init__(self, **classifications_and_words):
-        self.data = {}
+        self._data = {}
         for classification, words in classifications_and_words.items():
-            self.data[classification] = set(words)
+            self._data[classification] = set(words)
 
     def __getattr__(self, attr):
-        return self.data[attr]
+        return self._data[attr]
 
     def __getitem__(self, item: str) -> set[str]:
         return self._data[item]

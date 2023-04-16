@@ -1,7 +1,7 @@
 from cmdify.lexica import generate_index_and_classifier
 from cmdify.identifiers import GraphPruningIdentifier, CachedIdentifier
 from cmdify.processors import SimpleQueryProcessor
-from cmdify.result import Success, Failure, AmbiguousWordError, UnrecognizedWordError
+from cmdify.result import Success, Failure, Error, AmbiguousWordError, UnrecognizedWordError, Action, NounPhrase
 import itertools
 
 
@@ -108,16 +108,21 @@ def test():
         output = processor.process(query)
 
         if isinstance(output, Success):
-            for action in output.result:
-                print(f'Action: {action.verb}')
-                for noun in action.direct_objects:
-                    qualifiers = f' ({", ".join(noun._qualifiers)})' if len(noun._qualifiers) else ''
+            results: list[Action] = output.result
+
+            for action in results:
+                print(f'Action: {action._verb}')
+                direct_objects: list[NounPhrase] = action.direct_objects
+                for noun in direct_objects:
+                    qualifiers = f' ({", ".join(noun.qualifiers)})' if len(noun.qualifiers) else ''
                     print(f'    {noun.noun}{qualifiers}')
-                    for prep, deps in noun._prepositions.items():
-                        deps_list = [f'{n.noun} ({n._qualifiers})' if len(n._qualifiers) else f'{n.noun}' for n in deps]
+                    for prep, deps in noun.prepositions.items():
+                        deps_list = [f'{n.noun} ({n.qualifiers})' if len(n.qualifiers) else f'{n.noun}' for n in deps]
                         print(f'        {prep}: {", ".join(deps_list)}')
         elif isinstance(output, Failure):
-            for error in output.errors:
+            errors: list[Error] = output.errors
+
+            for error in errors:
                 if isinstance(error, AmbiguousWordError):
                     print(f'Ambiguous word "{error.word}" (could be: {", ".join(error.options)})')
                 elif isinstance(error, UnrecognizedWordError):

@@ -64,20 +64,25 @@ class NounPhrase:
             self._qualifiers = qualifiers
 
     @property
-    def noun(self):
+    def noun(self) -> str:
         return self._noun
 
-    def __contains__(self, item):
+    @property
+    def prepositions(self) -> dict[str, list['NounPhrase']]:
+        return self._prepositions
+
+    @property
+    def qualifiers(self) -> list[str]:
+        return self._qualifiers
+
+    def __contains__(self, item) -> bool:
         return item in self._prepositions
 
     def add_qualifier(self, qualifier: str):
         self._qualifiers.append(qualifier)
 
-    def add_preposition(self, preposition: str, dependents):
+    def add_preposition(self, preposition: str, dependents: 'NounPhrase'):
         self._prepositions[preposition] = dependents
-
-    def get_prepositions(self):
-        return self._prepositions.items()
 
 
 class PrepositionalPhrase:
@@ -88,24 +93,31 @@ class PrepositionalPhrase:
 
 class Action:
     def __init__(self):
-        self.verb = None
-        self.direct_objects = []
-        self.prepositional_phrases = []
+        self._verb = None
+        self._direct_objects = []
         self._last_modified = []
 
     def has_verb(self) -> bool:
-        return self.verb is not None
+        return self._verb is not None
 
     def set_verb(self, verb: str):
-        self.verb = verb
+        self._verb = verb
+
+    @property
+    def verb(self) -> str:
+        return self._verb
+
+    @property
+    def direct_objects(self) -> list[NounPhrase]:
+        return self._direct_objects
 
     def add_direct_object(self, direct_object: NounPhrase):
-        self.direct_objects.append(direct_object)
+        self._direct_objects.append(direct_object)
 
     def add_prepositional_phrase(self, prepositional_phrase: PrepositionalPhrase):
         cached = self._last_modified
         self._last_modified = []
-        for noun in self.direct_objects:
+        for noun in self._direct_objects:
             if prepositional_phrase.preposition not in noun:
                 self._last_modified.append(noun)
                 noun.add_preposition(prepositional_phrase.preposition, prepositional_phrase.dependents)

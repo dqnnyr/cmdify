@@ -8,7 +8,7 @@ Will be available with Release-0.1.
 from cmdify.lexica import generate_index_and_classifier
 from cmdify.identifiers import GraphPruningIdentifier, CachedIdentifier
 from cmdify.processors import SimpleQueryProcessor
-from cmdify.result import Success, Failure, AmbiguousWordError, UnrecognizedWordError
+from cmdify.result import *
 
 vocabulary = {
     'noun': {
@@ -36,18 +36,43 @@ processor = SimpleQueryProcessor(classifier, word_identifier)
 output = processor.process('play fireblal on the blue player and discard Lightning')
 
 if isinstance(output, Success):
-    for action in output.result:
-        print(action)
+    results: list[Action] = output.result
+
+    for action in results:
+        print(f'Action: {action.verb}')
+        for noun in action.direct_objects:
+            if len(noun.qualifiers):
+                print(f'    {noun.noun} ({", ".join(noun.qualifiers)})')
+            else:
+                print(f'    {noun.noun}')
+            prepositions: dict[str, list[NounPhrase]] = noun.prepositions
+            for prep, deps in noun.prepositions.items():
+                objects_of_preposition = [f'{n.noun} ({n.qualifiers})' if len(n.qualifiers) else f'{n.noun}' for n in deps]
+                print(f'        {prep}: {", ".join(objects_of_preposition)}')
+
 elif isinstance(output, Failure):
-    for error in output.errors:
-        if isinstance(error, AmbiguousWordError):
-            print(f'Ambiguous word "{error.word}" (could be: {", ".join(error.options)})')
-        elif isinstance(error, UnrecognizedWordError):
+    errors: list[Error] = output.errors
+
+    for error in errors:
+        if isinstance(error, UnrecognizedWordError):
+            # If the fuzzy detection found no close matches, or the literal detection
+            # produced no results, an `UnrecognizedWordError` is returned.
             print(f'Unrecognized word "{error.word}"')
+        elif isinstance(error, AmbiguousWordError):
+            # If the fuzzy detection returned multiple possible words with equal weight,
+            # an `AmbiguousWordError` is returned.
+            print(f'Ambiguous word "{error.word}" (could be: {", ".join(error.options)})')
+        elif isinstance(error, UnclassifiedWordError):
+            # This represents a desync between the WordClassifier and SynonymIndex.
+            # Cannot occur when using `generate_index_and_classifier`.
+            print(f'The word "{error.word}" could not be classified!')
 ```
 
 Expected output:
 ```
-{'verb': 'play', 'components': ['Fireball'], 'on': ['blue player']}
-{'verb': 'discard', 'components': ['Lightning']}
+Action: play
+    Fireball
+        on: player (blue)
+Action: discard
+    Lightning
 ```

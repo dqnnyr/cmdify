@@ -37,5 +37,8 @@ classifiers = [
     "Topic :: Games/Entertainment :: Board Games"
 ]
 
+[tool.setuptools]
+packages = ["cmdify*"]
+
 [project.urls]
 repository = "https://github.com/dqnnyr/cmdify.git"

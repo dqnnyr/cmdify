@@ -100,7 +100,7 @@ def get_test_data():
 
 def test():
     processor = QueryProcessor.factory()\
-        .set_vocabulary(get_test_data())\
+        .set_vocabulary(**get_test_data())\
         .set_preprocessor(SimplePreprocessor)\
         .set_identifier(GraphPruningIdentifier, threshold=6)\
         .add_identifier_wrapper(CachedIdentifier, buffer_size=60)\

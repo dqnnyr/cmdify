@@ -67,7 +67,7 @@ class QueryProcessor:
 
     def process(self, query) -> Result:
         tokens = self._preprocessor.preprocess(query)
-        canonical_words = self._identifier.identify(tokens)
+        canonical_words = self._identifier.identify_all(tokens)
 
         errors = []
         for original, candidates in canonical_words:

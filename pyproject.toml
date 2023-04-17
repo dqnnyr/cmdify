@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "A lightweight command-line language processing utility."
 readme = "README.md"
 requires-python = ">=3.11"
-license = {file = "LICENSE.txt"}
+license = {text = "MIT License"}
 authors = [
     {name = "Daniel Roland", email = "its.daniel.roland@gmail.com"},
     {name = "Jonathan M. Lobmeyer", email = "jmlobmeyer@gmail.com"},
@@ -38,7 +38,7 @@ classifiers = [
 ]
 
 [tool.setuptools]
-packages = ["cmdify*"]
+packages = ["cmdify"]
 
 [project.urls]
 repository = "https://github.com/dqnnyr/cmdify.git"

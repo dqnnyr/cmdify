@@ -2,7 +2,7 @@ import abc
 
 from cmdify.identifiers import Identifier
 from cmdify.lexica import WordClassifier
-from result import Result, Action, NounPhrase, PrepositionalPhrase
+from cmdify.result import Result, Action, NounPhrase, PrepositionalPhrase
 
 
 class Interpreter(abc.ABC):

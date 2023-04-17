@@ -1,21 +1,19 @@
 import abc
 from bidict import bidict
-from textdistance import damerau_levenshtein
 from cmdify.lexica import SynonymReverseIndex
+from textdistance import damerau_levenshtein
 
 
-class Identifier:
-    __metaclass__ = abc.ABCMeta
-
+class Identifier(abc.ABC):
     def __init__(self, word_index: SynonymReverseIndex, threshold: int):
         self.word_index = word_index
         self.threshold = threshold
 
     @abc.abstractmethod
-    def find_best(self, token: str) -> tuple[list[str], int]:
+    def identify(self, tokens: str) -> tuple[list[str], int]:
         return [], self.threshold
 
-    def find_best_from_all(self, tokens: list[str]) -> list[tuple[str, list[str]]]:
+    def identify_all(self, tokens: list[str]) -> list[tuple[str, list[str]]]:
         tokens = [token.lower() for token in tokens]
         all_results = []
         debt = 0
@@ -29,13 +27,13 @@ class Identifier:
                 continue
 
             best_token = token
-            best = self.find_best(token)
+            best = self.identify(token)
             i = 1
             new_token = token
             contender = ([], 0)  # This is never used but PyCharm seems to care
             while (i == 1 or len(contender[0])) and index + i < len(tokens):
                 new_token = new_token + ' ' + tokens[index + i]
-                contender = self.find_best(new_token)
+                contender = self.identify(new_token)
                 if contender[1] < best[1]:
                     best = contender
                     best_token = new_token
@@ -49,8 +47,15 @@ class Identifier:
         return all_results
 
 
+class IdentifierWrapper(Identifier, abc.ABC):
+    def __init__(self, identifier: Identifier):
+        super().__init__(identifier.word_index, identifier.threshold)
+        self._identifier = identifier
+
+
+
 class LiteralIdentifier(Identifier):
-    def find_best(self, token: str) -> tuple[list[str], int]:
+    def identify(self, token: str) -> tuple[list[str], int]:
         if token in self.word_index:
             return [self.word_index[token]], 0
         return [], 0
@@ -58,7 +63,7 @@ class LiteralIdentifier(Identifier):
 
 class FuzzyIdentifier(Identifier):
 
-    def find_best(self, token: str) -> tuple[list[str], int]:
+    def identify(self, token: str) -> tuple[list[str], int]:
         if token in self.word_index:
             return [self.word_index[token]], 0
         best = ([], self.threshold)
@@ -92,7 +97,7 @@ class GraphPruningIdentifier(Identifier):
                     self._graph[a][distance].add(b)
                     self._graph[b][distance].add(a)
 
-    def find_best(self, token: str) -> tuple[list[str], int]:
+    def identify(self, token: str) -> tuple[list[str], int]:
         if token in self.word_index:
             return [self.word_index[token]], 0
         eligible_words = set(self.word_index.keys())
@@ -119,24 +124,22 @@ class GraphPruningIdentifier(Identifier):
         return best
 
 
-class CachedIdentifier(Identifier):
+class CachedIdentifier(IdentifierWrapper):
     def __init__(self, identifier: Identifier, buffer_size: int):
-        super().__init__(identifier.word_index, identifier.threshold)
+        super().__init__(identifier)
         assert buffer_size >= 0
-
-        self._identifier = identifier
         self._buffer_size = buffer_size
         self._current_age = 0
         self._prune_age = 0
         self._cache = {}
         self._ages = bidict({})
 
-    def find_best(self, token: str) -> tuple[list[str], int]:
+    def identify(self, token: str) -> tuple[list[str], int]:
         if token in self._cache:
             self._ages.inverse[token] = self._current_age
             self._current_age = self._current_age + 1
             return self._cache[token]
-        result = self._identifier.find_best(token)
+        result = self._identifier.identify(token)
 
         self._cache[token] = result
         self._ages[self._current_age] = token

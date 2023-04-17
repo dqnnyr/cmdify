@@ -1,6 +1,8 @@
+from cmdify.core import QueryProcessor
 from cmdify.lexica import generate_index_and_classifier
 from cmdify.identifiers import GraphPruningIdentifier, CachedIdentifier
-from cmdify.processors import SimpleQueryProcessor
+from cmdify.interpreters import SimpleInterpreter
+from cmdify.preprocessors import SimplePreprocessor
 from cmdify.result import Success, Failure, Error, AmbiguousWordError, UnrecognizedWordError, Action, NounPhrase
 import itertools
 
@@ -97,11 +99,14 @@ def get_test_data():
 
 
 def test():
-    data = get_test_data()
-    index, classifier = generate_index_and_classifier(**data)
+    processor = QueryProcessor.factory()\
+        .set_vocabulary(get_test_data())\
+        .set_preprocessor(SimplePreprocessor)\
+        .set_identifier(GraphPruningIdentifier, threshold=6)\
+        .add_identifier_wrapper(CachedIdentifier, buffer_size=60)\
+        .set_interpreter(SimpleInterpreter)\
+        .build()
 
-    identifier = CachedIdentifier(GraphPruningIdentifier(index, threshold=6), buffer_size=50)
-    processor = SimpleQueryProcessor(classifier, identifier)
     # The SimpleQueryProcessor utilizes fuzzy detection.
     query = input('Query: ')
     while query != 'quit':

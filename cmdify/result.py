@@ -2,34 +2,27 @@ import abc
 from typing import Any
 
 
-class Result:
-    __metaclass__ = abc.ABCMeta
+class Result(abc.ABC):
+    pass
 
 
-class Error:
-    __metaclass__ = abc.ABCMeta
+class Error(abc.ABC):
+    pass
 
 
 class Success(Result):
-    """
-    Indicates that the function succeeded. The `result` attribute holds the output.
-    """
+    """Indicates that the function succeeded. The `result` attribute holds the output."""
     def __init__(self, result: Any):
         self.result = result
 
 
 class Failure(Result):
-    """
-    Indicates that the function failed. The `errors` attribute holds a list of discovered `Error`s.
-    """
+    """Indicates that the function failed. The `errors` attribute holds a list of discovered `Error`s."""
     def __init__(self, errors: list[Error]):
         self.errors = errors
 
-
 class UnrecognizedWordError(Error):
-    """
-    Indicates that there were no appropriate matches for a given word, stored in the `word`.
-    """
+    """Indicates that there were no appropriate matches for a given word, stored in the `word`."""
     def __init__(self, word: str):
         self.word = word
 

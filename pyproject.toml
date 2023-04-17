@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools", "setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cmdify"
+version = "0.1.0"
+description = "A lightweight command-line language processing utility."
+readme = "README.md"
+requires-python = ">=3.11"
+license = {file = "LICENSE.txt"}
+authors = [
+    {name = "Daniel Roland", email = "its.daniel.roland@gmail.com"},
+    {name = "Jonathan M. Lobmeyer", email = "jmlobmeyer@gmail.com"},
+    {name = "Nicole Livingston", email = "nliving73@gmail.com"},
+    {name = "William Blazer", email = "williamblazer2@gmail.com"},
+]
+dependencies = [
+    "bidict>0.22.1",
+    "textdistance>4.5.0"
+]
+keywords = [
+    "nlp",
+    "lightweight",
+    "command line",
+    "language processing",
+    "natural language processing",
+    "twilight imperium",
+    "ti4"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Games/Entertainment :: Board Games"
+]
+
+[project.urls]
+repository = "https://github.com/dqnnyr/cmdify.git"

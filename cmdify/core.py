@@ -65,19 +65,23 @@ class QueryProcessor:
     def factory():
         return QueryProcessorFactory()
 
+    # Processes original query and either returns an error or calls the interpreter
     def process(self, query) -> Result:
+        # Split query into tokens
         tokens = self._preprocessor.preprocess(query)
+        # Convert tokens into similar recognized words or phrases
         canonical_words = self._identifier.identify_all(tokens)
 
         errors = []
         for original, candidates in canonical_words:
-            if len(candidates) > 1:
+            if len(candidates) > 1: # Original word is ambiguous
                 errors.append(AmbiguousWordError(original, candidates))
-            elif len(candidates) == 0:
+            elif len(candidates) == 0: # Original word does not have a similar word in the vocabulary
                 errors.append(UnrecognizedWordError(original))
-            elif candidates[0] not in self._interpreter.word_classifier:
+            elif candidates[0] not in self._interpreter.word_classifier: # Candidate word not in classifier
                 errors.append(UnclassifiedWordError(candidates[0]))
         if len(errors):
             return Failure(errors)
 
+        # Interpret canonical words and return result as Success
         return Success(self._interpreter.interpret([item[1][0] for item in canonical_words]))

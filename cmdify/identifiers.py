@@ -53,7 +53,6 @@ class IdentifierWrapper(Identifier, abc.ABC):
         self._identifier = identifier
 
 
-
 class LiteralIdentifier(Identifier):
     def identify(self, token: str) -> tuple[list[str], int]:
         if token in self.word_index:

@@ -52,11 +52,9 @@ class SynonymReverseIndex:
 
 class WordClassifier:
     """
-    Constructs a reverse index for the purposes of getting a 'canonical representation' of words.
-
     .. highlight:: python
     .. code-block:: python
-        wc = SynonymReverseIndex({'noun': ['apple', 'orange'], 'verb': ['eat']})
+        wc = WordClassifier({'noun': ['apple', 'orange'], 'verb': ['eat']})
         assert 'apple' in wc['noun']
         assert 'eat' in wc['verb']
     """

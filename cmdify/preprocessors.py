@@ -1,7 +1,7 @@
 import abc
 import re
 
-# What is the point of this. Why is it here. Does it exist solely to have children?
+# This exists solely to have children
 class Preprocessor(abc.ABC):
     def __init__(self):
         pass
@@ -10,7 +10,7 @@ class Preprocessor(abc.ABC):
     def preprocess(self, query: str) -> list[str]:
         return []
 
-# Why do we have a class for this when it could just be one single function? 
+# Why do we have a class for this when it could just be one single function? (We don't need one)
 class SimplePreprocessor(Preprocessor):
     def preprocess(self, query: str) -> list[str]:
         # Creates a list of tokens 

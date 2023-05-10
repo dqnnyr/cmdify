@@ -4,7 +4,7 @@ from cmdify.identifiers import Identifier
 from cmdify.lexica import WordClassifier
 from cmdify.result import Result, Action, NounPhrase, PrepositionalPhrase
 
-
+# Do we need this abstract class?
 class Interpreter(abc.ABC):
     def __init__(self, word_classifier):
         self.word_classifier = word_classifier
@@ -30,6 +30,7 @@ class SimpleInterpreter(Interpreter):
         self.conjunction_class = conjunction_class
         self.particle_class = particle_class
 
+    # I'm sorry, what?
     def interpret(self, tokens: list[str]):
         actions = []
 

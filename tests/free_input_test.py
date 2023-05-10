@@ -1,3 +1,5 @@
+# import importlib
+# cmdify = importlib.import_module('cmdify')
 from cmdify.core import QueryProcessor
 from cmdify.lexica import generate_index_and_classifier
 from cmdify.identifiers import GraphPruningIdentifier, CachedIdentifier

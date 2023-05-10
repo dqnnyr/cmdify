@@ -1,4 +1,5 @@
 class SynonymReverseIndex:
+    # We should change "canonical word" to layman's terms
     """
     Constructs a reverse index for the purposes of getting a 'canonical representation' of words.
 

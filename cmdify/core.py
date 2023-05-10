@@ -69,19 +69,20 @@ class QueryProcessor:
     def process(self, query) -> Result:
         # Split query into tokens
         tokens = self._preprocessor.preprocess(query)
-        # Convert tokens into similar recognized words or phrases
+        # Convert tokens into similar recognized words or 
+        # Again, canonical
         canonical_words = self._identifier.identify_all(tokens)
 
         errors = []
         for original, candidates in canonical_words:
-            if len(candidates) > 1: # Original word is ambiguous
+            if len(candidates) > 1: # Original word is ambiguous --> in what way?
                 errors.append(AmbiguousWordError(original, candidates))
-            elif len(candidates) == 0: # Original word does not have a similar word in the vocabulary
+            elif len(candidates) == 0: # Original word does not have a similar word in the vocabulary --> wdtm?
                 errors.append(UnrecognizedWordError(original))
-            elif candidates[0] not in self._interpreter.word_classifier: # Candidate word not in classifier
+            elif candidates[0] not in self._interpreter.word_classifier: # Candidate word not in classifier --> so not in the vocabulary at all?
                 errors.append(UnclassifiedWordError(candidates[0]))
         if len(errors):
             return Failure(errors)
 
-        # Interpret canonical words and return result as Success
+        # Interpret canonical words and return result as Success --> what is success?
         return Success(self._interpreter.interpret([item[1][0] for item in canonical_words]))

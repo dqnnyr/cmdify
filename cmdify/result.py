@@ -1,7 +1,6 @@
 import abc
 from typing import Any
 
-
 class Result(abc.ABC):
     pass
 
@@ -21,22 +20,23 @@ class Failure(Result):
     def __init__(self, errors: list[Error]):
         self.errors = errors
 
+
 class UnrecognizedWordError(Error):
-    """Indicates that there were no appropriate matches for a given word, stored in the `word`."""
+    """Indicates that there were no appropriate matches for a given word, stored in `word`."""
     def __init__(self, word: str):
         self.word = word
 
-
+# This class is also a little ambiguous
 class AmbiguousWordError(Error):
     """
-    Indicates that multiple matches were equally appropriate for a given word. The word is stored in the `word`
+    Indicates that multiple matches were equally appropriate for a given word. Given word is stored in the `word`
     attribute, and the possible canonical representations are stored in the `options` attribute.
     """
     def __init__(self, word: str, options: list[str]):
         self.word = word
         self.options = options
 
-
+# I'm sorry, what?
 class UnclassifiedWordError(Error):
     """
     Indicates a mismatch between the Processor's `WordClassifier` and the underlying Identifier's `WordIndex`, as the
